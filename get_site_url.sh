@@ -41,4 +41,5 @@ fi
 
 echo "Done."
 
-# chmod +x publish_all.sh./publish_all.sh --use-https --enable-pages
+# chmod +x publish_all.sh
+#./publish_all.sh --use-https --enable-pages

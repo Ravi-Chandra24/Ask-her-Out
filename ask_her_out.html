@@ -68,8 +68,6 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            position: relative;
-            z-index: 2;
         }
 
         #yesBtn:hover {
@@ -82,7 +80,6 @@
             color: #374151;
             position: relative;
             transition: transform 0.18s ease-out;
-            z-index: 1;
         }
 
         #overlay {
@@ -141,7 +138,7 @@
 
 <div class="box">
 
-    <div class="decor-top">アネーシャ ラビチャンドラ❤️✨</div>
+    <div class="decor-top">❤️✨</div>
 
     <h2>Will you be my oxytocin receptor gene?</h2>
 
@@ -182,11 +179,9 @@
         function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
 
         // Move the No button to a random position constrained inside .box
-        // but avoid overlapping the Yes button.
         noBtn.addEventListener('mouseenter', function (e) {
             var boxRect = box.getBoundingClientRect();
             var btnRect = noBtn.getBoundingClientRect();
-            var yesRect = yesBtn.getBoundingClientRect();
 
             // compute allowed translate ranges so the button stays fully inside the box
             var minX = boxRect.left - btnRect.left + 8; // small padding
@@ -194,41 +189,11 @@
             var minY = boxRect.top - btnRect.top + 8;
             var maxY = boxRect.bottom - btnRect.bottom - 8;
 
-            function isOverlap(dx, dy) {
-                var newLeft = btnRect.left + dx;
-                var newRight = btnRect.right + dx;
-                var newTop = btnRect.top + dy;
-                var newBottom = btnRect.bottom + dy;
-                return !(newRight <= yesRect.left || newLeft >= yesRect.right || newBottom <= yesRect.top || newTop >= yesRect.bottom);
-            }
+            var dx = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+            var dy = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
 
-            var attempts = 0;
-            var dx, dy;
-            do {
-                dx = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
-                dy = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
-                attempts++;
-                if (attempts > 12) break;
-            } while (isOverlap(dx, dy));
-
-            if (isOverlap(dx, dy)) {
-                // fallback: move to side opposite yesBtn center
-                var boxCenterX = boxRect.left + boxRect.width/2;
-                if (yesRect.left + yesRect.width/2 < boxCenterX) {
-                    dx = maxX; // move to right
-                } else {
-                    dx = minX; // move to left
-                }
-                // vertical: move away from yesBtn
-                var boxCenterY = boxRect.top + boxRect.height/2;
-                if (yesRect.top + yesRect.height/2 < boxCenterY) {
-                    dy = maxY; // move down
-                } else {
-                    dy = minY; // move up
-                }
-                dx = clamp(dx, minX, maxX);
-                dy = clamp(dy, minY, maxY);
-            }
+            dx = clamp(dx, minX, maxX);
+            dy = clamp(dy, minY, maxY);
 
             noBtn.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
         });
@@ -271,7 +236,7 @@
         // clicking overlay background closes
         overlay.addEventListener('click', function(e){ if (e.target === overlay) closeDialog(); });
 
-        goPlan.addEventListener('click', function(){ window.location.href = 'schedule.html?full=1'; });
+        goPlan.addEventListener('click', function(){ window.location.href = 'schedule.html'; });
     })();
 </script>
 
