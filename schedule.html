@@ -11,14 +11,43 @@
             background:white; border-radius:15px;
             box-shadow:0 0 20px rgba(0,0,0,0.15);
         }
-        .step {padding:15px; background:#fff8fb; border-left:4px solid #ff4d6a; border-radius:8px; margin-bottom:20px;}
-        button {padding:8px 16px; border-radius:20px; border:none; cursor:pointer; font-weight:bold;}
+        .step {
+            padding:15px; background:#fff8fb;
+            border-left:4px solid #ff4d6a;
+            border-radius:8px; margin-bottom:20px;
+        }
+        button {
+            padding:8px 16px;
+            border-radius:20px;
+            border:none;
+            cursor:pointer;
+            font-weight:bold;
+        }
         .btn-primary {background:#ff4d6a; color:white;}
         .btn-secondary {background:#ddd;}
-        #fullPlan {margin-top:25px; background:#f8f8f8; padding:20px; border-radius:10px; display:none;}
-        .timeline-item {margin-bottom:12px; padding-left:12px; border-left:3px solid #ff4d6a;}
-        #byeBtn {margin-top:12px;}
-        #farewell {margin-top:12px; color:#374151; font-weight:600;}
+        #fullPlan {
+            margin-top:25px;
+            background:#f8f8f8;
+            padding:20px;
+            border-radius:10px;
+            display:none;
+        }
+        .timeline-item {
+            margin-bottom:12px;
+            padding-left:12px;
+            border-left:3px solid #ff4d6a;
+        }
+        #byeBtn {
+            margin-top:12px;
+            display:none; /* hidden at first, shown by JS */
+        }
+        #farewell {
+            margin-top:12px;
+            color:#374151;
+            font-weight:600;
+            display:none;
+            text-align:center;
+        }
     </style>
 </head>
 
@@ -31,16 +60,19 @@
     <div id="stepBox" class="step"></div>
 
     <div style="display:flex; justify-content:space-between;">
-        <button id="backBtn" class="btn-secondary">Back</button>
-        <button id="nextBtn" class="btn-primary">Next</button>
+        <button id="backBtn" class="btn-secondary" type="button">Back</button>
+        <button id="nextBtn" class="btn-primary" type="button">Next</button>
     </div>
 
     <div id="fullPlan">
         <h3>Full Timeline</h3>
         <div id="timeline"></div>
+
         <div style="margin-top:12px; text-align:center;">
-            <button id="byeBtn" class="btn-secondary" style="display:none;">Bye — see you soon</button>
-            <div id="farewell" style="display:none;"></div>
+            <button id="byeBtn" class="btn-secondary" type="button">
+                Bye — see you soon
+            </button>
+            <div id="farewell"></div>
         </div>
     </div>
 </div>
@@ -54,11 +86,13 @@ var steps = [
 ];
 
 var idx = 0;
-var stepBox = document.getElementById("stepBox");
-var backBtn = document.getElementById("backBtn");
-var nextBtn = document.getElementById("nextBtn");
-var fullPlan = document.getElementById("fullPlan");
-var timeline = document.getElementById("timeline");
+var stepBox   = document.getElementById("stepBox");
+var backBtn   = document.getElementById("backBtn");
+var nextBtn   = document.getElementById("nextBtn");
+var fullPlan  = document.getElementById("fullPlan");
+var timeline  = document.getElementById("timeline");
+var byeBtn    = document.getElementById("byeBtn");
+var farewell  = document.getElementById("farewell");
 
 function showStep() {
     var s = steps[idx];
@@ -69,7 +103,7 @@ function showStep() {
         <p>${s.note}</p>
     `;
     backBtn.disabled = idx === 0;
-    nextBtn.textContent = idx === steps.length-1 ? "Show full plan" : "Next";
+    nextBtn.textContent = (idx === steps.length - 1) ? "Show full plan" : "Next";
     fullPlan.style.display = "none";
 }
 
@@ -80,9 +114,7 @@ nextBtn.onclick = function() {
     } else {
         buildTimeline();
         fullPlan.style.display = "block";
-        // show the farewell button when full plan is visible
-        var byeBtn = document.getElementById('byeBtn');
-        if (byeBtn) byeBtn.style.display = 'inline-block';
+        byeBtn.style.display = "inline-block";
     }
 };
 
@@ -102,29 +134,27 @@ function buildTimeline() {
                 <span style="color:#777">${s.note}</span>
             </div>`;
     });
-
-    // attach bye button handler (idempotent)
-    var bye = document.getElementById('byeBtn');
-    if (bye) {
-        bye.onclick = function() {
-            var fav = document.getElementById('farewell');
-            fav.textContent = 'Bye — see you soon! Looking forward to our date.';
-            fav.style.display = 'block';
-            // optional: redirect back to the proposal after a short pause
-            setTimeout(function(){ window.location.href = 'ask_her_out.html'; }, 2200);
-        };
-    }
 }
 
+// Bye button behaviour
+byeBtn.onclick = function() {
+    farewell.textContent = "Bye — see you soon. I am already looking forward to our date.";
+    farewell.style.display = "block";
+    setTimeout(function(){
+        window.location.href = "ask_her_out.html";
+    }, 2200);
+};
+
+// Initial step
 showStep();
-// If opened with ?full=1, show the full plan immediately
+
+// Optional: open full timeline directly with ?full=1
 try {
     var params = new URLSearchParams(window.location.search);
-    if (params.get('full') === '1') {
+    if (params.get("full") === "1") {
         buildTimeline();
-        fullPlan.style.display = 'block';
-        var byeBtn = document.getElementById('byeBtn');
-        if (byeBtn) byeBtn.style.display = 'inline-block';
+        fullPlan.style.display = "block";
+        byeBtn.style.display = "inline-block";
     }
 } catch (e) {
     // ignore
