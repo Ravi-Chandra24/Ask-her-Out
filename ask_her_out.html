@@ -19,20 +19,7 @@
             height: 100vh;
             margin: 0;
             overflow: hidden;
-            transition: background 1s ease;
-        }
-
-        /* HEARTS */
-        .heart {
-            position: fixed;
-            color: red;
-            font-size: 24px;
-            animation: floatUp 1.8s ease forwards;
-            pointer-events: none;
-        }
-        @keyframes floatUp {
-            0%   { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-120px) scale(1.8); opacity: 0; }
+            transition: background 0.8s ease;
         }
 
         .box {
@@ -42,57 +29,110 @@
             border-radius: 18px;
             text-align: center;
             box-shadow: 0 12px 30px rgba(15,23,42,0.18);
-            position: relative;
-            transition: box-shadow 0.6s ease;
+            transition: box-shadow 0.6s ease, transform 0.6s ease;
         }
 
-        .glow {
-            box-shadow: 0 0 40px rgba(255,0,100,0.45), 0 0 80px rgba(255,0,100,0.25);
+        .box.glow {
+            box-shadow: 0 0 40px rgba(255,0,120,0.45), 0 0 80px rgba(255,0,120,0.25);
+            transform: scale(1.02);
         }
 
         h2 {
             font-family: "Playfair Display", serif;
+            margin: 0 0 10px 0;
+            font-size: 1.55rem;
+            color: #0f172a;
+        }
+
+        p {
+            margin: 0 0 16px 0;
+            font-size: 0.95rem;
+            color: #4b5563;
+        }
+
+        .small-note {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 8px;
         }
 
         #buttonRow {
-            margin-top: 14px;
+            margin: 14px 0;
         }
 
-        #yesBtn, #noBtn {
+        button {
             padding: 10px 20px;
             border-radius: 25px;
-            font-weight: 600;
+            border: none;
             cursor: pointer;
+            margin: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
         #yesBtn {
             background: #2563eb;
-            color: white;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(37,99,235,.55);
+        }
+
+        #yesBtn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(37,99,235,.65);
+            background:#1d4ed8;
         }
 
         #noBtn {
             background: #e5e7eb;
             color: #374151;
+            position: relative;
         }
 
         #goPlanBtn {
-            display:none;
             background:#2563eb;
-            color:white;
+            color:#fff;
             padding:10px 20px;
-            border-radius: 25px;
-            margin-top:15px;
+            border-radius:25px;
+            cursor:pointer;
+            font-weight:600;
+            margin-top:10px;
+            display:none;
         }
 
-        /* FADE-IN message */
+        #goPlanBtn:hover {
+            transform: translateY(-1px);
+            background:#1d4ed8;
+        }
+
+        /* yes message fade-in */
         #yesMessage {
             display:none;
             opacity: 0;
-            transition: opacity 1.2s ease;
+            transition: opacity 0.8s ease;
+            margin-top: 10px;
         }
 
         #yesMessage.show {
             opacity: 1;
+        }
+
+        /* floating hearts */
+        .heart {
+            position: fixed;
+            font-size: 22px;
+            animation: floatUp 1.8s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120px) scale(1.8);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -103,14 +143,18 @@
 
     <h2 id="mainQuestion">Will you be my oxytocin receptor gene?</h2>
 
-    <p id="introLine">You make everything feel a little softer, a little sweeter, just by being you.</p>
+    <p id="introLine">
+        You make everything feel a little softer, a little sweeter, just by being you.
+    </p>
 
     <div id="buttonRow">
-        <button id="yesBtn">❤️ Yes</button>
-        <button id="noBtn">No</button>
+        <button id="yesBtn" type="button">❤️ Yes</button>
+        <button id="noBtn" type="button">No</button>
     </div>
 
-    <p id="introNote">I know it’s cheesy but I really mean it.</p>
+    <p id="introNote" class="small-note">
+        I know it’s cheesy but I really mean it.
+    </p>
 
     <p id="yesMessage">
         I knew you’d hit yes.<br>
@@ -124,17 +168,18 @@
 <script>
 (function(){
 
-    var yesBtn     = document.getElementById("yesBtn");
-    var noBtn      = document.getElementById("noBtn");
-    var yesMessage = document.getElementById("yesMessage");
-    var goPlanBtn  = document.getElementById("goPlanBtn");
-    var mainBox    = document.getElementById("mainBox");
-    var introLine  = document.getElementById("introLine");
-    var introNote  = document.getElementById("introNote");
+    var yesBtn       = document.getElementById("yesBtn");
+    var noBtn        = document.getElementById("noBtn");
+    var buttonRow    = document.getElementById("buttonRow");
+    var introLine    = document.getElementById("introLine");
+    var introNote    = document.getElementById("introNote");
     var mainQuestion = document.getElementById("mainQuestion");
-    var escaped = false;
+    var yesMessage   = document.getElementById("yesMessage");
+    var goPlanBtn    = document.getElementById("goPlanBtn");
+    var mainBox      = document.getElementById("mainBox");
+    var escaped      = false;
 
-    /* TELEPORT LOGIC */
+    // No button teleport outside box, no overlap
     noBtn.addEventListener("mouseenter", function(){
         if (!escaped) {
             escaped = true;
@@ -149,58 +194,70 @@
         var btnW = noBtn.offsetWidth;
         var btnH = noBtn.offsetHeight;
         var boxRect = mainBox.getBoundingClientRect();
-        var margin = 40;
+        var margin = 60;
 
         var x, y, tries = 0;
         do {
-            x = Math.random()*(vw-btnW);
-            y = Math.random()*(vh-btnH);
+            x = Math.random()*(vw - btnW);
+            y = Math.random()*(vh - btnH);
             tries++;
+
             var overlap =
                 x+btnW > boxRect.left-margin &&
                 x      < boxRect.right+margin &&
                 y+btnH > boxRect.top-margin &&
                 y      < boxRect.bottom+margin;
+
         } while(overlap && tries < 25);
 
         noBtn.style.left = x+"px";
         noBtn.style.top  = y+"px";
     });
 
-    /* YES BUTTON */
-    yesBtn.addEventListener("click", function(){
+    // Small helper to spawn hearts
+    function spawnHearts() {
+        var centerX = window.innerWidth / 2;
+        var centerY = window.innerHeight / 2;
 
-        // Hide everything
-        noBtn.style.display = "none";
-        yesBtn.style.display = "none";
-        introLine.style.display = "none";
-        introNote.style.display = "none";
+        for (let i = 0; i < 12; i++) {
+            setTimeout(function(){
+                var heart = document.createElement("div");
+                heart.className = "heart";
+                heart.textContent = "❤️";
+
+                var offsetX = (Math.random() * 200) - 100; // left/right spread
+                var offsetY = (Math.random() * 60) - 30;   // slight vertical jitter
+
+                heart.style.left = (centerX + offsetX) + "px";
+                heart.style.top  = (centerY + offsetY) + "px";
+
+                document.body.appendChild(heart);
+
+                setTimeout(function(){
+                    heart.remove();
+                }, 1900);
+            }, i * 120);
+        }
+    }
+
+    // Yes button: hide old stuff, show message + effects
+    yesBtn.addEventListener("click", function(){
+        noBtn.style.display      = "none";
+        yesBtn.style.display     = "none";
+        introLine.style.display  = "none";
+        introNote.style.display  = "none";
         mainQuestion.style.display = "none";
 
-        // Show message
         yesMessage.style.display = "block";
-        setTimeout(() => yesMessage.classList.add("show"), 50);
+        // allow CSS transition to kick in
+        requestAnimationFrame(function(){
+            yesMessage.classList.add("show");
+        });
 
-        // Glow box
         mainBox.classList.add("glow");
+        spawnHearts();
 
-        // Hearts burst
-        for (let i = 0; i < 14; i++) {
-            setTimeout(() => {
-                let heart = document.createElement("div");
-                heart.classList.add("heart");
-                heart.innerHTML = "❤️";
-                heart.style.left = (window.innerWidth/2 + (Math.random()*200-100)) + "px";
-                heart.style.top =  (window.innerHeight/2 + (Math.random()*60-30)) + "px";
-                document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 1800);
-            }, i*120);
-        }
-
-        // Show plan button
-        setTimeout(()=> {
-            goPlanBtn.style.display="inline-block";
-        }, 900);
+        goPlanBtn.style.display  = "inline-block";
     });
 
     goPlanBtn.addEventListener("click", function(){
