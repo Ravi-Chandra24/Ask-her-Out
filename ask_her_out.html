@@ -5,6 +5,7 @@
     <title>Will You Be My Oxytocin Receptor Gene?</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
@@ -28,6 +29,7 @@
             border-radius: 18px;
             text-align: center;
             box-shadow: 0 12px 30px rgba(15,23,42,0.18);
+            position: relative;
         }
 
         .decor-top {
@@ -142,35 +144,66 @@
 
 <script>
 (function(){
-    var yesBtn = document.getElementById("yesBtn");
-    var noBtn = document.getElementById("noBtn");
-    var buttonRow = document.getElementById("buttonRow");
-    var introLine = document.getElementById("introLine");
-    var introNote = document.getElementById("introNote");
+    var box        = document.querySelector(".box");
+    var yesBtn     = document.getElementById("yesBtn");
+    var noBtn      = document.getElementById("noBtn");
+    var buttonRow  = document.getElementById("buttonRow");
+    var introLine  = document.getElementById("introLine");
+    var introNote  = document.getElementById("introNote");
     var yesMessage = document.getElementById("yesMessage");
-    var goPlanBtn = document.getElementById("goPlanBtn");
+    var goPlanBtn  = document.getElementById("goPlanBtn");
     var mainQuestion = document.getElementById("mainQuestion");
-    var topName = document.getElementById("topName");
+    var topName    = document.getElementById("topName");
+
+    var escaped = false; // track if No has started teleporting
 
     noBtn.addEventListener("mouseenter", function () {
+        // On first hover, convert No button to fixed so it can move outside the box
+        if (!escaped) {
+            escaped = true;
+            var rect = noBtn.getBoundingClientRect();
+            noBtn.style.position = "fixed";
+            noBtn.style.left = rect.left + "px";
+            noBtn.style.top  = rect.top + "px";
+        }
+
+        var vw = window.innerWidth;
+        var vh = window.innerHeight;
+
+        var btnW = noBtn.offsetWidth;
+        var btnH = noBtn.offsetHeight;
+
+        var boxRect = box.getBoundingClientRect();
+        var margin = 20;
+
+        var x, y, tries = 0;
+        do {
+            x = Math.random() * (vw - btnW);
+            y = Math.random() * (vh - btnH);
+            tries++;
+
+            var overlap =
+                x + btnW  > boxRect.left - margin &&
+                x         < boxRect.right + margin &&
+                y + btnH  > boxRect.top - margin &&
+                y         < boxRect.bottom + margin;
+        } while (overlap && tries < 30);
+
         noBtn.style.transition = "none";
-        var maxShift = 140;
-        var minShift = 50;
-        var direction = Math.random() < 0.5 ? -1 : 1;
-        var distance = minShift + Math.random() * (maxShift - minShift);
-        var dx = direction * distance;
-        noBtn.style.transform = "translateX(" + dx + "px)";
+        noBtn.style.left = x + "px";
+        noBtn.style.top  = y + "px";
     });
 
     yesBtn.addEventListener("click", function () {
-        buttonRow.style.display="none";
-        introLine.style.display="none";
-        introNote.style.display="none";
-        mainQuestion.style.display="none";
-        topName.style.display="none";
+        buttonRow.style.display = "none";
+        introLine.style.display = "none";
+        introNote.style.display = "none";
+        mainQuestion.style.display = "none";
+        topName.style.display = "none";
 
-        yesMessage.style.display="block";
-        goPlanBtn.style.display="inline-block";
+        yesMessage.style.display = "block";
+        goPlanBtn.style.display  = "inline-block";
+        noBtn.style.display      = "none";
     });
 
     goPlanBtn.addEventListener("click", function () {
