@@ -82,7 +82,6 @@ var steps = [
         address: "725 Weidman Rd, Manchester, MO 63011",
         map: "https://maps.app.goo.gl/rd3Kho1JyF5YvGyg9"
     },
-
     {
         time: "10:30 AM",
         place: "The Ground Coffeehouse and Plant Shop",
@@ -90,7 +89,6 @@ var steps = [
         address: "109 Ballpark Dr, Ballwin, MO 63011",
         map: "https://maps.app.goo.gl/iZinbT7MVvETVA7R8"
     },
-
     {
         time: "12:00 PM",
         place: "Tabla Restaurant",
@@ -99,7 +97,6 @@ var steps = [
         map: "https://maps.app.goo.gl/HqADs5YyQbTwhHtJ7"
     }
 ];
-</script>
 
 var idx = 0;
 var stepBox  = document.getElementById("stepBox");
@@ -115,6 +112,7 @@ function showStep() {
         <p><strong>Time:</strong> ${s.time}</p>
         <p><strong>Place:</strong> ${s.place}</p>
         <p>${s.address}</p>
+        <p><a href="${s.map}" target="_blank">Open in Maps</a></p>
     `;
     backBtn.disabled = idx === 0;
     nextBtn.textContent = idx === steps.length - 1
@@ -146,7 +144,8 @@ function buildTimeline() {
         timeline.innerHTML += `
             <div class="timeline-item">
                 <strong>${s.time}</strong> — ${s.title} at ${s.place}<br>
-                <span style="color:#777">${s.address}</span>
+                <span style="color:#777">${s.address}</span><br>
+                <a href="${s.map}" target="_blank">Open in Maps</a>
             </div>
         `;
     });
