@@ -5,11 +5,8 @@ set -euo pipefail
 # Prints the GitHub Pages site URL for the repo and checks HTTP status.
 
 OWNER="Ravi-Chandra24"
-REPO="Ask-her-Out"
-
-# Random placeholder URL (change later to whatever you want)
-EXPECTED_URL="https://Mamoni-Ravi-Chandra.com/"
-
+REPO="Mamoni"
+EXPECTED_URL="https://${OWNER}.github.io/${REPO}/"
 echo "Repository: ${OWNER}/${REPO}"
 
 SITE_URL=""
